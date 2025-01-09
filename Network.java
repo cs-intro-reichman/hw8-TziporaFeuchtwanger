@@ -12,10 +12,6 @@ public class Network {
         this.userCount = 0;
     }
 
-    public int getUserCount(){
-        return this.userCount;
-    }
-
     /** Creates a network  with some users. The only purpose of this constructor is 
      *  to allow testing the toString and getUser methods, before implementing other methods. */
     public Network(int maxUserCount, boolean gettingStarted) {
@@ -26,14 +22,17 @@ public class Network {
         userCount = 3;
     }
 
+    public int getUserCount() {
+        return this.userCount;
+    }
     /** Finds in this network, and returns, the user that has the given name.
      *  If there is no such user, returns null.
      *  Notice that the method receives a String, and returns a User object. */
     public User getUser(String name) {
         if ( name == null) {return null;}
-        for (int i = 0; i < users.length; i++) {
+        for (int i = 0; i < userCount; i++) {
             if ( users[i] != null && name!= null)  {
-                if (users[i].getName().equals(name)) {
+                if (users[i].getName().toLowerCase().equals(name.toLowerCase())) {
                     return users[i]; 
                 }   
             }
@@ -46,7 +45,7 @@ public class Network {
     *  If the given name is already a user in this network, does nothing and returns false;
     *  Otherwise, creates a new user with the given name, adds the user to this network, and returns true. */
     public boolean addUser(String name) {
-        if (userCount == users.length && this.getUser(name) != null) {return false;}
+        if (userCount == users.length && this.getUser(name) == null) {return false;}
         else{
             this.users[userCount] = new User(name);
             userCount++;
@@ -58,7 +57,7 @@ public class Network {
      *  If any of the two names is not a user in this network,
      *  or if the "follows" addition failed for some reason, returns false. */
     public boolean addFollowee(String name1, String name2) {
-        if (getUser(name2) == null || getUser(name1) == null) {
+        if (getUser(name2) == null || getUser(name1) == null || name1 == name2) {
             return false;
         }
         return getUser(name1).addFollowee(name2);      
@@ -71,7 +70,7 @@ public class Network {
         String recommended = "";
         if (this.getUser(name) == null){return null;}
         for (int i = 0; i < userCount; i++) {
-            if (getUser(name).countMutual(users[i]) > max) {
+            if (getUser(name).countMutual(users[i]) > max && name != users[i].getName()) {
                 max =  getUser(name).countMutual(users[i]);
                 recommended = users[i].getName(); 
             }                                                             
@@ -82,6 +81,7 @@ public class Network {
     /** Computes and returns the name of the most popular user in this network: 
      *  The user who appears the most in the follow lists of all the users. */
     public String mostPopularUser() {
+        if (userCount == 0) {return null;}
         int mostpopular = 0;
         String mostP ="";
         for (int i = 0; i < userCount; i++) {
@@ -90,8 +90,8 @@ public class Network {
             mostP = users[i].getName();
            }    
         }  
-    return mostP;
-}
+        return mostP;
+    }   
 
     /** Returns the number of times that the given name appears in the follows lists of all
      *  the users in this network. Note: A name can appear 0 or 1 times in each list. */
@@ -108,9 +108,9 @@ public class Network {
 
     // Returns a textual description of all the users in this network, and who they follow.
     public String toString() {
-        String textuslNetwork = "Network:\n";
+        String textuslNetwork = "Network:";
         for (int i = 0; i < userCount; i++) {
-            textuslNetwork += users[i].toString()+"\n";
+            textuslNetwork += "\n"+users[i].toString();
         }  
        return textuslNetwork;
     }
